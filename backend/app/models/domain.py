@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from sqlalchemy import Column, String, Float, Boolean, ForeignKey, DateTime, Text, Enum as SQLEnum
+from sqlalchemy import Column, String, Float, Boolean, ForeignKey, DateTime, Text, Enum as SQLEnum, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from pgvector.sqlalchemy import Vector
@@ -90,6 +90,9 @@ class ProductFeature(Base):
 
 class PriceObservation(Base):
     __tablename__ = "price_observations"
+    __table_args__ = (
+        Index("ix_price_observations_product_id_observed_at", "product_id", "observed_at"),
+    )
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     product_id = Column(UUID(as_uuid=True), ForeignKey("products.id"), nullable=False)
     price = Column(Float, nullable=False)

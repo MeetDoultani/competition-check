@@ -6,6 +6,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*.env
+.env.*
 
 # Python
 __pycache__/
@@ -47,3 +49,14 @@ coverage.xml
 .idea/
 .DS_Store
 Thumbs.db
+
+# Node / Frontend (React/Vite)
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache

@@ -6,7 +6,7 @@ from typing import List
 from uuid import UUID
 
 from app.core.database import get_db
-from app.models.domain import Product, AttributeTemplate, Evidence
+from app.models.domain import Product, AttributeTemplate, Evidence, ProductSpecification
 from app.schemas.product import ProductResponse, ProductSpecificationResponse, BrandResponse, CategoryResponse
 from app.schemas.ingestion import URLIngestRequest
 
@@ -19,7 +19,8 @@ async def list_products(skip: int = 0, limit: int = 20, db: AsyncSession = Depen
         .options(
             selectinload(Product.brand),
             selectinload(Product.category),
-            selectinload(Product.specifications).selectinload(Product.attribute)
+            selectinload(Product.specifications).selectinload(ProductSpecification.attribute),
+            selectinload(Product.specifications).selectinload(ProductSpecification.evidence)
         )
         .offset(skip)
         .limit(limit)
@@ -58,8 +59,8 @@ async def get_product(product_id: UUID, db: AsyncSession = Depends(get_db)):
         .options(
             selectinload(Product.brand),
             selectinload(Product.category),
-            selectinload(Product.specifications).selectinload(Product.attribute),
-            selectinload(Product.specifications).selectinload(Product.evidence)
+            selectinload(Product.specifications).selectinload(ProductSpecification.attribute),
+            selectinload(Product.specifications).selectinload(ProductSpecification.evidence)
         )
         .where(Product.id == product_id)
     )
@@ -91,6 +92,4 @@ async def get_product(product_id: UUID, db: AsyncSession = Depends(get_db)):
 
 @router.post("/ingest-url", status_code=status.HTTP_202_ACCEPTED)
 async def ingest_url(request: URLIngestRequest, db: AsyncSession = Depends(get_db)):
-    # The URL is already validated by Pydantic's HttpUrl
-    # In a real system, this would trigger a background task (Phase 7)
     return {"message": "URL accepted for ingestion", "url": str(request.url)}
